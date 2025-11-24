@@ -1,5 +1,6 @@
+import { Link } from 'react-router-dom';
 import { APP_NAME, ROUTES } from '../constants';
-import './NavBar.module.css';
+import styles from './NavBar.module.css';
 
 /**
  * NavBar Component
@@ -7,23 +8,23 @@ import './NavBar.module.css';
  */
 const NavBar = () => {
   return (
-    <nav className="navbar">
-      <div className="navbar-container">
-        <div className="navbar-brand">
-          <a href={ROUTES.HOME}>{APP_NAME}</a>
+    <nav className={styles.navbar}>
+      <div className={styles.navbarContainer}>
+        <div className={styles.navbarBrand}>
+          <Link to={ROUTES.HOME}>{APP_NAME}</Link>
         </div>
-        <ul className="navbar-menu">
+        <ul className={styles.navbarMenu}>
           <li>
-            <a href={ROUTES.HOME}>Home</a>
+            <Link to={ROUTES.HOME}>Home</Link>
           </li>
           <li>
-            <a href={ROUTES.ABOUT}>About</a>
+            <Link to={ROUTES.ABOUT}>About</Link>
           </li>
           <li>
-            <a href={ROUTES.DASHBOARD}>Dashboard</a>
+            <Link to={ROUTES.DASHBOARD}>Dashboard</Link>
           </li>
           <li>
-            <a href={ROUTES.SETTINGS}>Settings</a>
+            <Link to={ROUTES.SETTINGS}>Settings</Link>
           </li>
         </ul>
       </div>
