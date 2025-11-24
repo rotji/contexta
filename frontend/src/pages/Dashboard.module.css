@@ -1,0 +1,201 @@
+/**
+ * Dashboard Page Styles (Module CSS)
+ * Mobile-first responsive design
+ */
+
+/* Mobile styles (base) - 320px+ */
+.dashboardContainer {
+  padding: 1.5rem 1rem;
+  min-height: calc(100vh - 80px);
+  background: linear-gradient(to bottom, #f9fafb 0%, #ffffff 100%);
+}
+
+.dashboardContent {
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.dashboardTitle {
+  font-size: 2rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+  color: var(--color-gray-900);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.dashboardDescription {
+  font-size: 1rem;
+  color: var(--color-text-secondary);
+  margin-bottom: 2rem;
+  line-height: 1.5;
+}
+
+.dashboardGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.dashboardCard {
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  padding: 1.5rem;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  text-align: center;
+  transition: all 0.3s ease;
+  border: 1px solid var(--color-gray-200);
+  position: relative;
+  overflow: hidden;
+  /* Touch-friendly */
+  min-height: 100px;
+}
+
+.dashboardCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+}
+
+.dashboardCard:active {
+  transform: scale(0.98);
+  box-shadow: var(--shadow-lg);
+}
+
+.dashboardCard h3 {
+  font-size: 0.938rem;
+  color: var(--color-gray-600);
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+}
+
+.statNumber {
+  font-size: 2.5rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0;
+  line-height: 1;
+}
+
+.recentConversations {
+  background: white;
+  padding: 1.5rem;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--color-gray-200);
+}
+
+.recentConversations h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  color: var(--color-gray-800);
+  font-weight: 700;
+}
+
+.emptyState {
+  color: var(--color-text-secondary);
+  text-align: center;
+  padding: 2rem 1rem;
+  font-style: italic;
+  font-size: 0.938rem;
+  background: var(--color-bg-tertiary);
+  border-radius: var(--radius-lg);
+}
+
+/* Small tablets - 480px+ */
+@media (min-width: 30em) {
+  .dashboardContainer {
+    padding: 2rem 1.25rem;
+  }
+
+  .dashboardTitle {
+    font-size: 2.25rem;
+  }
+
+  .dashboardGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+  }
+}
+
+/* Tablets - 640px+ */
+@media (min-width: 40em) {
+  .dashboardTitle {
+    font-size: 2.5rem;
+  }
+
+  .dashboardDescription {
+    font-size: 1.125rem;
+  }
+
+  .dashboardCard {
+    padding: 1.75rem;
+  }
+
+  /* Enable hover effects on larger screens */
+  @media (hover: hover) {
+    .dashboardCard:hover {
+      transform: translateY(-6px);
+      box-shadow: var(--shadow-xl);
+      border-color: #667eea;
+    }
+  }
+
+  .recentConversations {
+    padding: 2rem;
+  }
+}
+
+/* Desktop - 1024px+ */
+@media (min-width: 64em) {
+  .dashboardContainer {
+    padding: 3rem 2rem;
+  }
+
+  .dashboardTitle {
+    font-size: 3rem;
+  }
+
+  .dashboardDescription {
+    font-size: 1.25rem;
+    margin-bottom: 3rem;
+  }
+
+  .dashboardGrid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.75rem;
+    margin-bottom: 3rem;
+  }
+
+  .dashboardCard {
+    padding: 2rem;
+  }
+
+  .statNumber {
+    font-size: 3rem;
+  }
+
+  .recentConversations {
+    padding: 2.5rem;
+  }
+
+  .recentConversations h2 {
+    font-size: 1.875rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .emptyState {
+    padding: 3rem 2rem;
+    font-size: 1.125rem;
+  }
+}
