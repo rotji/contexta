@@ -1,5 +1,5 @@
 import { APP_NAME, APP_DESCRIPTION } from '../constants';
-import './Home.module.css';
+import styles from './Home.module.css';
 
 /**
  * Home Page Component
@@ -7,11 +7,11 @@ import './Home.module.css';
  */
 const Home = () => {
   return (
-    <div className="home-container">
-      <div className="home-content">
-        <h1 className="home-title">{APP_NAME}</h1>
-        <p className="home-description">{APP_DESCRIPTION}</p>
-        <button className="home-button">
+    <div className={styles.homeContainer}>
+      <div className={styles.homeContent}>
+        <h1 className={styles.homeTitle}>{APP_NAME}</h1>
+        <p className={styles.homeDescription}>{APP_DESCRIPTION}</p>
+        <button className={styles.homeButton}>
           Start a Conversation
         </button>
       </div>
