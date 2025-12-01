@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { api } from '../services/api';
+import { api, setLogoutHandler } from '../services/api';
+import { toast } from 'react-toastify';
 
 interface AuthContextType {
   user: { id: string; email: string } | null;
@@ -21,6 +22,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setToken(storedToken);
       // Optionally decode token to get user info, or fetch profile
     }
+    // Set logout handler for API service
+    setLogoutHandler(logout);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const login = async (email: string, password: string) => {
@@ -39,6 +43,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setToken(null);
     setUser(null);
     localStorage.removeItem('token');
+    toast.info('You have been logged out. Please log in again.', { position: 'top-center' });
+    setTimeout(() => {
+      window.location.href = '/';
+    }, 1500);
   };
 
   return (

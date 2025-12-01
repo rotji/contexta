@@ -5,8 +5,16 @@
  */
 
 import axios from 'axios';
-import type { AxiosInstance, AxiosError } from 'axios';
-import { API_BASE_URL, API_ENDPOINTS } from '../constants';
+import type { AxiosInstance, AxiosError, InternalAxiosRequestConfig } from 'axios';
+// Extend AxiosRequestConfig to allow custom _retry property
+type CustomAxiosRequestConfig = InternalAxiosRequestConfig & { _retry?: boolean };
+import { API_BASE_URL, API_ENDPOINTS, ROUTES } from '../constants';
+
+// Logout handler to be set by AuthContext
+let logoutHandler: (() => void) | null = null;
+export const setLogoutHandler = (handler: () => void) => {
+  logoutHandler = handler;
+};
 
 // Create axios instance with base configuration
 const apiClient: AxiosInstance = axios.create({
@@ -32,10 +40,74 @@ apiClient.interceptors.request.use(
 );
 
 // Response interceptor - for global error handling
+let isRefreshing = false;
+let failedQueue: any[] = [];
+
+const processQueue = (error: any, token: string | null = null) => {
+  failedQueue.forEach(prom => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token);
+    }
+  });
+  failedQueue = [];
+};
+
 apiClient.interceptors.response.use(
   (response) => response,
-  (error: AxiosError) => {
-    // Handle errors gracefully
+  async (error: AxiosError) => {
+    const originalRequest = error.config as CustomAxiosRequestConfig | undefined;
+    if (
+      error.response &&
+      error.response.status === 401 &&
+      originalRequest &&
+      !originalRequest._retry
+    ) {
+      if (isRefreshing) {
+        return new Promise(function (resolve, reject) {
+          failedQueue.push({ resolve, reject });
+        })
+          .then((token) => {
+            if (originalRequest.headers) {
+              (originalRequest.headers as any)['Authorization'] = `Bearer ${token}`;
+            }
+            return apiClient(originalRequest);
+          })
+          .catch((err) => {
+            return Promise.reject(err);
+          });
+      }
+      originalRequest._retry = true;
+      isRefreshing = true;
+      try {
+        const refreshResponse = await apiClient.post('/api/auth/refresh', {}, { withCredentials: true });
+        const { token } = refreshResponse.data;
+        if (token) {
+          localStorage.setItem('token', token);
+          processQueue(null, token);
+          if (originalRequest.headers) {
+            (originalRequest.headers as any)['Authorization'] = `Bearer ${token}`;
+          }
+          return apiClient(originalRequest);
+        } else {
+          processQueue(new Error('No token in refresh response'), null);
+        }
+      } catch (refreshError) {
+        processQueue(refreshError, null);
+        // Call logout handler if set, otherwise fallback to redirect
+        localStorage.removeItem('token');
+        if (logoutHandler) {
+          logoutHandler();
+        } else {
+          window.location.href = ROUTES.HOME;
+        }
+        return Promise.reject(refreshError);
+      } finally {
+        isRefreshing = false;
+      }
+    }
+    // Handle other errors gracefully
     if (error.response) {
       console.error('API Error:', error.response.data);
     } else if (error.request) {

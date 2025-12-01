@@ -11,6 +11,8 @@ import { ROUTES } from './constants';
 import Signup from './pages/Signup';
 import Login from './pages/Login';
 import './App.css';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
   const [connectionStatus, setConnectionStatus] = useState<string>('');
@@ -34,10 +36,12 @@ function App() {
   }, []);
 
   return (
-    <Router>
-      <NavBar />
-      <Routes>
-        <Route path={ROUTES.HOME} element={<Home />} />
+    <>
+      <ToastContainer />
+      <Router>
+        <NavBar />
+        <Routes>
+          <Route path={ROUTES.HOME} element={<Home />} />
         <Route path={ROUTES.CONVERSATION} element={<ConversationRoom />} />
         <Route path={ROUTES.ABOUT} element={<About />} />
         <Route path={ROUTES.DASHBOARD} element={<Dashboard />} />
