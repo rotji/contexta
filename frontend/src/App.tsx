@@ -63,6 +63,7 @@ function App() {
         {loading ? 'Connecting...' : connectionStatus}
       </div>
     </Router>
+    </>
   );
 }
 
