@@ -1,7 +1,4 @@
-/**
- * Home Page Styles (Module CSS)
- * Modern hero section design
- */
+/* Home Page Styles (Module CSS) */
 
 .homeContainer {
   display: flex;
@@ -88,37 +85,30 @@
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
 }
 
-/* Responsive design - tablet */
 @media (max-width: 968px) {
   .homeTitle {
     font-size: 3rem;
   }
-
   .homeDescription {
     font-size: 1.25rem;
   }
-
   .homeButton {
     padding: 1rem 2rem;
     font-size: 1rem;
   }
 }
 
-/* Responsive design - mobile */
 @media (max-width: 640px) {
   .homeContainer {
     padding: 2rem 1rem;
   }
-
   .homeTitle {
     font-size: 2.25rem;
   }
-
   .homeDescription {
     font-size: 1.125rem;
     margin-bottom: 2rem;
   }
-
   .homeButton {
     padding: 0.875rem 1.75rem;
     font-size: 0.938rem;

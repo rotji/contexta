@@ -1,0 +1,123 @@
+/* Settings Page Styles (Module CSS) */
+
+.settingsContainer {
+  min-height: calc(100vh - 80px);
+  padding: 2.5rem 1rem;
+  background: linear-gradient(135deg, #f3f4f6 0%, #e0e7ff 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.settingsContent {
+  background: #fff;
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
+  padding: 2.5rem 2rem;
+  max-width: 540px;
+  width: 100%;
+}
+
+.settingsTitle {
+  font-size: 2rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+  color: #3b82f6;
+  text-align: center;
+}
+
+.settingsDescription {
+  font-size: 1.1rem;
+  color: var(--color-text-secondary);
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.settingsSection {
+  margin-bottom: 2rem;
+}
+
+.settingsSection h2 {
+  font-size: 1.15rem;
+  color: #64748b;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.settingItem {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+  background: #f9fafb;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-md);
+}
+
+.settingItem label {
+  font-size: 1rem;
+  color: #374151;
+  font-weight: 500;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.settingItem input[type="range"] {
+  width: 120px;
+  accent-color: #3b82f6;
+}
+
+.settingItem input[type="checkbox"] {
+  accent-color: #3b82f6;
+  width: 1.1em;
+  height: 1.1em;
+  margin-right: 0.5em;
+}
+
+.settingItem select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background: #fff;
+  border: 1px solid #d1d5db;
+  border-radius: var(--radius-md);
+  padding: 0.5rem 1.5rem 0.5rem 0.75rem;
+  font-size: 1rem;
+  color: #374151;
+  transition: border 0.2s;
+  min-width: 140px;
+}
+.settingItem select:focus {
+  border-color: #3b82f6;
+  outline: none;
+}
+
+.saveButton {
+  display: block;
+  margin: 2rem auto 0 auto;
+  background: #10b981;
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-lg);
+  padding: 0.85rem 2.5rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(16,185,129,0.08);
+  transition: background 0.2s, box-shadow 0.2s;
+}
+.saveButton:hover {
+  background: #059669;
+  box-shadow: 0 4px 16px rgba(16,185,129,0.13);
+}
+
+@media (max-width: 640px) {
+  .settingsContent {
+    padding: 1.25rem 0.5rem;
+  }
+  .settingsTitle {
+    font-size: 1.3rem;
+  }
+}

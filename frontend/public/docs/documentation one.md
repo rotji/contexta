@@ -187,6 +187,7 @@ contexta/
 │
 └── README.md
 
+
 frontend/
 │   vite.config.ts
 │   tsconfig.json
@@ -194,47 +195,52 @@ frontend/
 │   index.html
 │
 └── src/
-    ├── assets/               # images, icons, logos
-    │
-    ├── components/
-    │   ├── MicButton.tsx
-    │   ├── LiveTranscript.tsx
-    │   ├── AiResponseBubble.tsx
-    │   ├── ConversationSummary.tsx
-    │   ├── AudioVisualizer.tsx
-    │   └── Loader.tsx
-    │
-    ├── pages/
-    │   ├── Home.tsx
-    │   ├── ConversationRoom.tsx
-    │   ├── Dashboard.tsx
-    │   └── Settings.tsx
-    │
-    ├── hooks/
-    │   ├── useMicrophone.ts
-    │   ├── useWebSocket.ts
-    │   └── useAuth.ts
-    │
-    ├── services/
-    │   ├── api.ts            # REST API calls
-    │   └── ws.ts             # WebSocket client
-    │
-    ├── store/
-    │   ├── conversationStore.ts
-    │   └── userStore.ts
-    │
-    ├── types/
-    │   ├── conversation.ts
-    │   └── user.ts
-    │
-    ├── styles/
-    │   ├── global.css
-    │   └── theme.css
-    │
-    ├── App.tsx
-    └── main.tsx
+   ├── assets/               # images, icons, logos
+   │
+   ├── components/
+   │   ├── MicButton.tsx
+   │   ├── LiveTranscript.tsx
+   │   ├── AiResponseBubble.tsx
+   │   ├── ConversationSummary.tsx
+   │   ├── AudioVisualizer.tsx
+   │   ├── Loader.tsx
+   │   └── NuancedToggle.tsx   # (PRIORITY) Toggle for nuanced options
+   │
+   ├── pages/
+   │   ├── Home.tsx
+   │   ├── ConversationRoom.tsx  # (PRIORITY) Integrate NuancedToggle and nuanced options display
+   │   ├── Dashboard.tsx
+   │   └── Settings.tsx
+   │
+   ├── hooks/
+   │   ├── useMicrophone.ts
+   │   ├── useWebSocket.ts
+   │   ├── useAuth.ts
+   │   └── useNuancedOptions.ts   # (PRIORITY) Hook for nuanced logic
+   │
+   ├── services/
+   │   ├── api.ts            # REST API calls
+   │   ├── ws.ts             # WebSocket client
+   │   └── nuancedOptions.ts   # (PRIORITY) API for nuanced options
+   │
+   ├── store/
+   │   ├── conversationStore.ts
+   │   └── userStore.ts
+   │
+   ├── types/
+   │   ├── conversation.ts
+   │   ├── user.ts
+   │   └── nuanced.ts         # (PRIORITY) Types for nuanced options
+   │
+   ├── styles/
+   │   ├── global.css
+   │   └── theme.css
+   │
+   ├── App.tsx
+   └── main.tsx
 
 backend/
+
 │   package.json
 │   tsconfig.json
 │   .env
@@ -251,18 +257,21 @@ backend/
 │   │   ├── auth.routes.ts
 │   │   ├── convo.routes.ts     # save transcripts, get history
 │   │   ├── upload.routes.ts    # documents upload for knowledge injection
-│   │   └── user.routes.ts
+│   │   ├── user.routes.ts
+│   │   └── nuanced.routes.ts   # (PRIORITY) Route for nuanced options
 │
 │   ├── controllers/
 │   │   ├── auth.controller.ts
 │   │   ├── convo.controller.ts
-│   │   └── user.controller.ts
+│   │   ├── user.controller.ts
+│   │   └── nuanced.controller.ts # (PRIORITY) Controller for nuanced logic
 │
 │   ├── services/
 │   │   ├── ai.service.ts        # calls GPT, summarizes, answers
 │   │   ├── diarization.service.ts
 │   │   ├── translation.service.ts
-│   │   └── embeddings.service.ts
+│   │   ├── embeddings.service.ts
+│   │   └── nuanced.service.ts   # (PRIORITY) Service for nuanced logic
 │
 │   ├── websocket/
 │   │   └── audio.socket.ts      # real-time audio handler
@@ -275,7 +284,8 @@ backend/
 │   │   ├── User.ts
 │   │   ├── Conversation.ts
 │   │   ├── Transcript.ts
-│   │   └── Document.ts
+│   │   ├── Document.ts
+│   │   └── NuancedOption.ts     # (PRIORITY) Model for nuanced options
 │
 │   └── utils/
 │       ├── logger.ts
@@ -890,6 +900,20 @@ This list is **ordered from 1 → 120**, perfectly structured for daily executio
 
 ---
 
+### **Nuanced Options Feature**
+
+* Integrate the “Nuanced Options” principle into the platform:
+   - PRIORITY: Implement in both backend and frontend structure.
+   - Detect when a conversation involves a choice between two or more options (backend service, model, and route).
+   - Add a “Nuanced” toggle button in the Conversation Room UI (NuancedToggle.tsx component).
+   - When enabled, AI presents all logical stances (e.g., A, B, both, neither for two options) with supporting facts for each (nuancedOptions API, display in ConversationRoom).
+   - When disabled, AI gives standard, direct answers.
+   - Add supporting hooks, types, and store logic for nuanced options.
+
+---
+
+---
+
 # ✅ **PHASE 1 — SETUP & BASICS (Very Simple)**
 
 ### *(Start here – no AI yet)*
@@ -1097,3 +1121,33 @@ Do you want:
 ### **D. Or the first code files to start (frontend + backend boilerplates)?**
 
 Just tell me **A, B, C, D or ALL**.
+
+---
+
+# 🧩 **Nuanced Options Principle**
+
+## Theory
+
+In any conversation or debate, when people are presented with two or more options, there are often more possible stances than just picking one or the other. For example, with two options (A and B), the real choices are:
+
+1. Choose A
+2. Choose B
+3. Choose both A and B (hybrid)
+4. Choose neither (reject both)
+
+This approach encourages more open, creative, and inclusive discussions, avoiding false dichotomies and allowing for hybrid or neutral positions. For three options, there are six possible stances (all combinations except the empty set).
+
+**We call this the “Nuanced Options” Principle.** It’s a core part of Contexta’s conversation intelligence.
+
+## Technical Implementation
+
+- The platform detects when a conversation involves a choice between two or more options.
+- When the “Nuanced” button is toggled on, the AI will:
+   - Present all logical stances (e.g., A, B, both, neither for two options).
+   - Provide supporting facts, pros/cons, or data for each stance.
+- This feature can be toggled by users in the UI (e.g., a “Nuanced” button in the conversation room).
+- When off, the AI gives standard, direct answers.
+
+**UI/UX:**  
+- Add a “Nuanced” toggle button in the Conversation Room.  
+- When enabled, the AI’s responses expand to show all nuanced options, not just the obvious binary.

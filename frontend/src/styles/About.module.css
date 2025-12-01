@@ -1,6 +1,4 @@
-/**
- * About Page Styles (Module CSS)
- */
+/* About Page Styles (Module CSS) */
 
 .aboutContainer {
   padding: 3rem 2rem;
@@ -82,28 +80,22 @@
   box-shadow: var(--shadow-md);
 }
 
-/* Responsive */
 @media (max-width: 768px) {
   .aboutContainer {
     padding: 2rem 1rem;
   }
-
   .aboutTitle {
     font-size: 2.25rem;
   }
-
   .aboutDescription {
     font-size: 1.125rem;
   }
-
   .aboutSection {
     padding: 1.75rem;
   }
-
   .aboutSection h2 {
     font-size: 1.5rem;
   }
-
   .featuresList {
     grid-template-columns: 1fr;
   }

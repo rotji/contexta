@@ -1,23 +1,36 @@
-/**
- * Main Server Entry Point
- * Sets up Express server with middleware and routes
- */
+import express from 'express';
+import cors from 'cors';
+import helmet from 'helmet';
+import morgan from 'morgan';
+import dotenv from 'dotenv';
 
-const express = require('express');
-const cors = require('cors');
-const helmet = require('helmet');
-const morgan = require('morgan');
-require('dotenv').config();
+dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// Import conversation, AI, and auth routes
+import convoRoutes from './routes/convo.routes';
+import aiRoutes from './routes/ai.routes';
+import authRoutes from './routes/auth.routes';
+
 // Middleware
-app.use(helmet()); // Security headers
-app.use(cors()); // Enable CORS
-app.use(morgan('dev')); // Logging
-app.use(express.json()); // Parse JSON bodies
-app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
+app.use(helmet());
+app.use(cors());
+app.use(morgan('dev'));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+
+
+// Auth endpoints
+app.use('/api/auth', authRoutes);
+
+// Conversation history endpoints
+app.use('/api/conversations', convoRoutes);
+
+// AI response endpoint
+app.use('/api/ai', aiRoutes);
 
 // Test endpoint
 app.get('/api/ping', (req, res) => {
@@ -42,7 +55,7 @@ app.use((req, res) => {
 });
 
 // Error handler
-app.use((err, req, res, next) => {
+app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
   console.error(err.stack);
   res.status(500).json({
     success: false,
@@ -51,7 +64,6 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Start server
 app.listen(PORT, () => {
   console.log(`🚀 Contexta backend running on http://localhost:${PORT}`);
   console.log(`📡 API ready at http://localhost:${PORT}/api`);

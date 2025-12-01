@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { APP_NAME, ROUTES } from '../constants';
-import styles from './NavBar.module.css';
+import styles from '../styles/NavBar.module.css';
 
 /**
  * NavBar Component

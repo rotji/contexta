@@ -1,5 +1,5 @@
 import { APP_NAME, APP_DESCRIPTION } from '../constants';
-import styles from './About.module.css';
+import styles from '../styles/About.module.css';
 
 /**
  * About Page Component

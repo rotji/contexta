@@ -8,7 +8,10 @@
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
 export const API_ENDPOINTS = {
   PING: '/api/ping',
-  // Future endpoints will be added here
+  CONVERSATIONS: '/api/conversations',
+  AI_RESPONSE: '/api/ai/response',
+  SIGNUP: '/api/auth/register',
+  LOGIN: '/api/auth/login',
 } as const;
 
 // Application Constants

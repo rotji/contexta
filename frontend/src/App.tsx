@@ -2,11 +2,14 @@ import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import NavBar from './components/NavBar';
 import Home from './pages/Home';
+import ConversationRoom from './pages/ConversationRoom';
 import About from './pages/About';
 import Dashboard from './pages/Dashboard';
 import Settings from './pages/Settings';
 import { api } from './services/api';
 import { ROUTES } from './constants';
+import Signup from './pages/Signup';
+import Login from './pages/Login';
 import './App.css';
 
 function App() {
@@ -35,9 +38,12 @@ function App() {
       <NavBar />
       <Routes>
         <Route path={ROUTES.HOME} element={<Home />} />
+        <Route path={ROUTES.CONVERSATION} element={<ConversationRoom />} />
         <Route path={ROUTES.ABOUT} element={<About />} />
         <Route path={ROUTES.DASHBOARD} element={<Dashboard />} />
         <Route path={ROUTES.SETTINGS} element={<Settings />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/login" element={<Login />} />
       </Routes>
       {/* Connection status indicator */}
       <div style={{ 

@@ -1,0 +1,247 @@
+
+import React, { useState, useRef } from 'react';
+import { api } from '../services/api';
+import NuancedToggle from '../components/NuancedToggle';
+import { useNuancedOptions } from '../hooks/useNuancedOptions';
+import { useNavigate } from 'react-router-dom';
+import styles from '../styles/ConversationRoom.module.css';
+
+const ConversationRoom: React.FC = () => {
+
+  const [listening, setListening] = useState(false);
+  const [transcript, setTranscript] = useState('');
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiResponse, setAiResponse] = useState('');
+  const recognitionRef = useRef<any>(null);
+  const [nuancedEnabled, setNuancedEnabled] = useState(false);
+  const { options: nuancedOptions, loading: nuancedLoading, error: nuancedError, getNuancedOptions } = useNuancedOptions();
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const navigate = useNavigate();
+  const handleSaveSession = async () => {
+    setSaving(true);
+    setSaveError(null);
+    try {
+      await api.saveConversation({
+        transcript: transcript.replace(' [listening]', ''),
+        aiResponse,
+        nuancedOptions: nuancedEnabled && nuancedOptions ? nuancedOptions : [],
+      });
+      navigate('/dashboard');
+    } catch (e: any) {
+      setSaveError(e.message || 'Failed to save session');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleMicClick = () => {
+    if (!listening) {
+      // Start listening
+      if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+        const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+        const recognition = new SpeechRecognition();
+        recognition.lang = 'en-US';
+        recognition.interimResults = true;
+        recognition.continuous = true;
+        recognition.onresult = (event: any) => {
+          let interimTranscript = '';
+          for (let i = event.resultIndex; i < event.results.length; ++i) {
+            if (event.results[i].isFinal) {
+              setTranscript((prev) => prev + event.results[i][0].transcript + ' ');
+            } else {
+              interimTranscript += event.results[i][0].transcript;
+            }
+          }
+          if (interimTranscript) {
+            setTranscript((prev) => prev.split(' [listening]')[0] + ' [listening]' + interimTranscript);
+          }
+        };
+        recognition.onerror = (event: any) => {
+          setListening(false);
+        };
+        recognition.onend = () => {
+          setListening(false);
+        };
+        recognitionRef.current = recognition;
+        recognition.start();
+          // Do NOT clear transcript here; preserve previous transcript for long conversations
+        setListening(true);
+      } else {
+        // Fallback: Demo transcript
+          setTranscript((prev) => prev + 'Hello! This is a demo transcript. (Speech recognition not supported in this browser.) ');
+        setListening(true);
+      }
+    } else {
+      // Stop listening
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
+        recognitionRef.current = null;
+      }
+      setListening(false);
+      setTranscript((prev) => prev.replace(' [listening]', ''));
+    }
+  };
+
+  // Fetch nuanced options when toggled on and transcript exists
+  React.useEffect(() => {
+    if (nuancedEnabled && transcript) {
+      getNuancedOptions(transcript.replace(' [listening]', ''));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [nuancedEnabled, transcript]);
+
+  const speak = (text: string) => {
+    if ('speechSynthesis' in window) {
+      const utterance = new window.SpeechSynthesisUtterance(text);
+      utterance.lang = 'en-US';
+      window.speechSynthesis.speak(utterance);
+    }
+  };
+
+  const handleAskAi = async () => {
+    setAiLoading(true);
+    setAiResponse('');
+    try {
+      const data = await api.askAi(transcript.replace(' [listening]', ''));
+      console.log('AI Response:', data.aiResponse); // Debug log
+      setAiResponse(data.aiResponse || 'AI: No response.');
+      if (data.aiResponse) speak(data.aiResponse);
+    } catch (e) {
+        setTranscript(''); // Clear transcript only when session is saved
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
+  return (
+    <div className={styles.conversationRoomContainer}>
+      <div className={styles.header}>Conversation Room</div>
+      <div className={styles.transcriptArea}>
+        {transcript ? (
+          <span>{transcript.replace(' [listening]', '')}</span>
+        ) : (
+          <div className={styles.placeholder}>
+            {listening ? 'Listening... Start speaking.' : 'Click the mic to start live transcription.'}
+          </div>
+        )}
+      </div>
+      <div style={{ width: '100%', maxWidth: 700, margin: '2rem auto 0', textAlign: 'center' }}>
+        <button
+          type="button"
+          onClick={handleSaveSession}
+          disabled={saving || !transcript}
+          style={{
+            background: '#10b981',
+            color: '#fff',
+            border: 'none',
+            borderRadius: '2rem',
+            padding: '0.75rem 2.5rem',
+            fontWeight: 700,
+            fontSize: '1.1rem',
+            opacity: saving || !transcript ? 0.7 : 1,
+            cursor: saving || !transcript ? 'not-allowed' : 'pointer',
+            transition: 'all 0.2s',
+            marginTop: 8,
+          }}
+        >
+          {saving ? 'Saving...' : 'Save & End Session'}
+        </button>
+        {saveError && <div style={{ color: '#ef4444', marginTop: 8 }}>{saveError}</div>}
+      </div>
+      <div className={styles.controls}>
+        <button type="button" onClick={handleMicClick} style={{
+          background: listening ? '#3b82f6' : '#fff',
+          color: listening ? '#fff' : '#3b82f6',
+          border: '2px solid #3b82f6',
+          borderRadius: '2rem',
+          padding: '0.75rem 2rem',
+          fontWeight: 700,
+          fontSize: '1.1rem',
+          cursor: 'pointer',
+          transition: 'all 0.2s',
+        }}>
+          {listening ? '🛑 Stop' : '🎤 Mic'}
+        </button>
+        <button
+          type="button"
+          onClick={handleAskAi}
+          disabled={aiLoading || !transcript}
+          style={{
+            background: aiLoading ? '#64748b' : '#3b82f6',
+            color: '#fff',
+            border: 'none',
+            borderRadius: '2rem',
+            padding: '0.75rem 2rem',
+            fontWeight: 700,
+            fontSize: '1.1rem',
+            opacity: aiLoading || !transcript ? 0.7 : 1,
+            cursor: aiLoading || !transcript ? 'not-allowed' : 'pointer',
+            transition: 'all 0.2s',
+          }}
+        >
+          {aiLoading ? 'Thinking...' : 'Ask AI'}
+        </button>
+      </div>
+      <div style={{ width: '100%', maxWidth: 700, marginTop: '2rem' }}>
+        <div style={{
+          background: '#e0e7ff',
+          borderRadius: 'var(--radius-lg)',
+          padding: '1.25rem',
+          marginBottom: '1rem',
+          color: '#3730a3',
+          fontWeight: 600,
+          fontSize: '1.1rem',
+          textAlign: 'center',
+          minHeight: '2.5rem',
+        }}>
+          {/* AI response area */}
+          {aiLoading ? <span>AI is thinking...</span> : aiResponse || <span>AI response will appear here.</span>}
+        </div>
+        <div style={{
+          background: '#fff',
+          borderRadius: 'var(--radius-lg)',
+          padding: '1rem',
+          color: '#64748b',
+          fontSize: '1rem',
+          textAlign: 'center',
+          border: '1px dashed #c7d2fe',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '0.5rem' }}>
+            <NuancedToggle enabled={nuancedEnabled} onToggle={() => setNuancedEnabled((v) => !v)} />
+            <span style={{ fontSize: '0.95rem', marginLeft: 8, color: '#64748b' }}>Nuanced Options</span>
+          </div>
+          {nuancedEnabled ? (
+            nuancedLoading ? (
+              <span>Loading nuanced options...</span>
+            ) : nuancedError ? (
+              <span style={{ color: '#ef4444' }}>{nuancedError}</span>
+            ) : nuancedOptions && nuancedOptions.length > 0 ? (
+              <ul style={{ textAlign: 'left', margin: '0 auto', maxWidth: 520 }}>
+                {nuancedOptions.map((opt, idx) => (
+                  <li key={idx} style={{ marginBottom: 12, padding: 8, borderRadius: 8, background: '#f1f5f9', color: '#334155' }}>
+                    <strong>{opt.label}</strong>
+                    <div style={{ fontSize: '0.97rem', margin: '4px 0 0 0' }}>{opt.description}</div>
+                    {opt.facts && opt.facts.length > 0 && (
+                      <ul style={{ margin: '6px 0 0 1.2em', fontSize: '0.93rem', color: '#64748b' }}>
+                        {opt.facts.map((fact, i) => (
+                          <li key={i}>{fact}</li>
+                        ))}
+                      </ul>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <span>No nuanced options available for this context.</span>
+            )
+          ) : (
+            <span>Nuanced options will appear here.</span>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ConversationRoom;

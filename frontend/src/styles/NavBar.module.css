@@ -1,7 +1,4 @@
-/**
- * NavBar Component Styles (Module CSS)
- * Modern, clean navigation bar
- */
+/* NavBar Component Styles (Module CSS) */
 
 .navbar {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -62,45 +59,37 @@
   transform: translateY(-1px);
 }
 
-/* Active link style */
 .navbarMenu li a:active {
   transform: translateY(0);
 }
 
-/* Responsive design - tablet */
 @media (max-width: 968px) {
   .navbarContainer {
     padding: 0.875rem 1.5rem;
   }
-
   .navbarMenu {
     gap: 0.25rem;
   }
-
   .navbarMenu li a {
     padding: 0.5rem 1rem;
     font-size: 0.875rem;
   }
 }
 
-/* Responsive design - mobile */
 @media (max-width: 640px) {
   .navbarContainer {
     padding: 0.75rem 1rem;
     flex-wrap: wrap;
     gap: 0.75rem;
   }
-
   .navbarBrand a {
     font-size: 1.5rem;
   }
-
   .navbarMenu {
     width: 100%;
     justify-content: center;
     gap: 0.25rem;
   }
-
   .navbarMenu li a {
     padding: 0.5rem 0.75rem;
     font-size: 0.813rem;
