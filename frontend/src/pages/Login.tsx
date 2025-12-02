@@ -3,9 +3,11 @@ import { api } from '../services/api';
 import { useNavigate } from 'react-router-dom';
 
 const Login: React.FC = () => {
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -13,9 +15,11 @@ const Login: React.FC = () => {
     e.preventDefault();
     setLoading(true);
     setError(null);
+    setSuccess(null);
     try {
       await api.login(email, password);
-      navigate('/dashboard');
+      setSuccess('Login successful!');
+      setTimeout(() => navigate('/dashboard'), 1200);
     } catch (err: any) {
       setError(err.response?.data?.error || 'Login failed');
     } finally {
@@ -36,6 +40,7 @@ const Login: React.FC = () => {
           <input type="password" value={password} onChange={e => setPassword(e.target.value)} required style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #cbd5e1' }} />
         </div>
         {error && <div style={{ color: '#ef4444', marginBottom: 12 }}>{error}</div>}
+        {success && <div style={{ color: '#22c55e', marginBottom: 12 }}>{success}</div>}
         <button type="submit" disabled={loading} style={{ width: '100%', background: '#3b82f6', color: '#fff', padding: 12, border: 'none', borderRadius: 8, fontWeight: 700, fontSize: 16, cursor: loading ? 'not-allowed' : 'pointer' }}>
           {loading ? 'Logging in...' : 'Log In'}
         </button>
