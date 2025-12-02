@@ -14,6 +14,16 @@ connectDB();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// Body parsing middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Enable CORS for frontend
+app.use(cors({
+  origin: 'http://localhost:5173',
+  credentials: true
+}));
+
 // Import conversation, AI, and auth routes
 import convoRoutes from './routes/convo.routes';
 import aiRoutes from './routes/ai.routes';
