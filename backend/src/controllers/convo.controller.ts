@@ -20,13 +20,15 @@ export async function getConversations(req: AuthRequest, res: Response) {
 
 
 export async function saveConversation(req: AuthRequest, res: Response) {
-  const { transcript, aiResponse, nuancedOptions } = req.body;
+  const { conversationId, transcript, aiResponse, nuancedOptions } = req.body;
   const userId = req.user?.userId;
   if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+  if (!conversationId) return res.status(400).json({ error: 'conversationId required' });
   if (!transcript) return res.status(400).json({ error: 'Transcript required' });
   try {
     const convo = await ConversationModel.create({
       userId,
+      conversationId,
       transcript,
       aiResponse: aiResponse || '',
       nuancedOptions: nuancedOptions || [],

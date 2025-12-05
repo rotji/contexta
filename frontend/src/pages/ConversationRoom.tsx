@@ -1,5 +1,6 @@
 
 import React, { useState, useRef } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 import { api } from '../services/api';
 import NuancedToggle from '../components/NuancedToggle';
 import { useNuancedOptions } from '../hooks/useNuancedOptions';
@@ -10,6 +11,7 @@ const ConversationRoom: React.FC = () => {
 
   const [listening, setListening] = useState(false);
   const [transcript, setTranscript] = useState('');
+  const [conversationId] = useState(() => uuidv4());
   const [aiLoading, setAiLoading] = useState(false);
   const [aiResponse, setAiResponse] = useState('');
   const recognitionRef = useRef<any>(null);
@@ -18,20 +20,19 @@ const ConversationRoom: React.FC = () => {
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const navigate = useNavigate();
-  const handleSaveSession = async () => {
-    setSaving(true);
-    setSaveError(null);
+
+  // Save the entire transcript before asking AI
+  const saveFullTranscript = async () => {
     try {
       await api.saveConversation({
+        conversationId,
         transcript: transcript.replace(' [listening]', ''),
         aiResponse,
         nuancedOptions: nuancedEnabled && nuancedOptions ? nuancedOptions : [],
       });
-      navigate('/dashboard');
     } catch (e: any) {
       setSaveError(e.message || 'Failed to save session');
-    } finally {
-      setSaving(false);
+      throw e;
     }
   };
 
@@ -102,13 +103,15 @@ const ConversationRoom: React.FC = () => {
   const handleAskAi = async () => {
     setAiLoading(true);
     setAiResponse('');
+    setSaveError(null);
     try {
-      const data = await api.askAi(transcript.replace(' [listening]', ''));
+      await saveFullTranscript();
+      const data = await api.askAi(conversationId);
       console.log('AI Response:', data.aiResponse); // Debug log
       setAiResponse(data.aiResponse || 'AI: No response.');
       if (data.aiResponse) speak(data.aiResponse);
     } catch (e) {
-        setTranscript(''); // Clear transcript only when session is saved
+      setSaveError(e.message || 'Failed to save or get AI response');
     } finally {
       setAiLoading(false);
     }
@@ -126,29 +129,8 @@ const ConversationRoom: React.FC = () => {
           </div>
         )}
       </div>
-      <div style={{ width: '100%', maxWidth: 700, margin: '2rem auto 0', textAlign: 'center' }}>
-        <button
-          type="button"
-          onClick={handleSaveSession}
-          disabled={saving || !transcript}
-          style={{
-            background: '#10b981',
-            color: '#fff',
-            border: 'none',
-            borderRadius: '2rem',
-            padding: '0.75rem 2.5rem',
-            fontWeight: 700,
-            fontSize: '1.1rem',
-            opacity: saving || !transcript ? 0.7 : 1,
-            cursor: saving || !transcript ? 'not-allowed' : 'pointer',
-            transition: 'all 0.2s',
-            marginTop: 8,
-          }}
-        >
-          {saving ? 'Saving...' : 'Save & End Session'}
-        </button>
-        {saveError && <div style={{ color: '#ef4444', marginTop: 8 }}>{saveError}</div>}
-      </div>
+      {/* Save & End Session button removed for user-friendly flow */}
+      {saveError && <div style={{ color: '#ef4444', marginTop: 8 }}>{saveError}</div>}
       <div className={styles.controls}>
         <button type="button" onClick={handleMicClick} style={{
           background: listening ? '#3b82f6' : '#fff',

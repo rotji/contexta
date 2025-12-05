@@ -175,6 +175,7 @@ export const api = {
    * Save a conversation
    */
   saveConversation: async (data: {
+    conversationId: string;
     transcript: string;
     aiResponse: string;
     nuancedOptions: any[];
@@ -190,9 +191,9 @@ export const api = {
   /**
    * Get AI response for a transcript
    */
-  askAi: async (transcript: string) => {
+  askAi: async (conversationId: string) => {
     try {
-      const response = await apiClient.post(API_ENDPOINTS.AI_RESPONSE, { transcript });
+      const response = await apiClient.post(API_ENDPOINTS.AI_RESPONSE, { conversationId });
       return response.data;
     } catch (error) {
       throw error;
