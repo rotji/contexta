@@ -14,6 +14,7 @@ const ConversationRoom: React.FC = () => {
   const [conversationId] = useState(() => uuidv4());
   const [aiLoading, setAiLoading] = useState(false);
   const [aiResponse, setAiResponse] = useState('');
+  const [audioBase64, setAudioBase64] = useState<string | null>(null);
   const recognitionRef = useRef<any>(null);
   const [nuancedEnabled, setNuancedEnabled] = useState(false);
   const { options: nuancedOptions, loading: nuancedLoading, error: nuancedError, getNuancedOptions } = useNuancedOptions();
@@ -93,13 +94,8 @@ const ConversationRoom: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [nuancedEnabled, transcript]);
 
-  const speak = (text: string) => {
-    if ('speechSynthesis' in window) {
-      const utterance = new window.SpeechSynthesisUtterance(text);
-      utterance.lang = 'en-US';
-      window.speechSynthesis.speak(utterance);
-    }
-  };
+
+  // Remove browser speechSynthesis. Playback will use Azure-generated audio only.
 
   const handleAskAi = async () => {
     setAiLoading(true);
@@ -110,7 +106,7 @@ const ConversationRoom: React.FC = () => {
       const data = await api.askAi(conversationId);
       console.log('AI Response:', data.aiResponse); // Debug log
       setAiResponse(data.aiResponse || 'AI: No response.');
-      if (data.aiResponse) speak(data.aiResponse);
+      setAudioBase64(data.audio || null);
     } catch (e) {
       setSaveError(e.message || 'Failed to save or get AI response');
     } finally {
@@ -180,6 +176,37 @@ const ConversationRoom: React.FC = () => {
         }}>
           {/* AI response area */}
           {aiLoading ? <span>AI is thinking...</span> : aiResponse || <span>AI response will appear here.</span>}
+          {audioBase64 && (
+            <div style={{ marginTop: 12 }}>
+              <audio controls src={`data:audio/mp3;base64,${audioBase64}`} style={{ width: '100%' }} />
+              <button
+                style={{
+                  marginTop: 8,
+                  background: '#3b82f6',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '1.5rem',
+                  padding: '0.5rem 1.5rem',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  fontSize: '1rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                }}
+                onClick={() => {
+                  const link = document.createElement('a');
+                  link.href = `data:audio/mp3;base64,${audioBase64}`;
+                  link.download = 'ai-voice-note.mp3';
+                  document.body.appendChild(link);
+                  link.click();
+                  document.body.removeChild(link);
+                }}
+              >
+                <span role="img" aria-label="download">📥</span> Download Voice Note
+              </button>
+            </div>
+          )}
         </div>
         <div style={{
           background: '#fff',
